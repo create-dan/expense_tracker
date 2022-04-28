@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_constructors_in_immutables
 
+import 'dart:html';
+
 import 'package:expense_tracker/widgets/chart.dart';
 import 'package:expense_tracker/widgets/new_transaction.dart';
 import 'package:expense_tracker/widgets/transaction_list.dart';
@@ -52,6 +54,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // ),
   ];
 
+  bool _showDark = false;
+
   List<Transaction>? get _recentTransactions {
     return _userTransactions.where((tx) {
       return tx.date.isAfter(
@@ -97,24 +101,79 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Expense Tracker",
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _startAddNewTransaction(context),
-          )
-        ],
+    final appBar = AppBar(
+      title: Text(
+        "Expense Tracker",
       ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => _startAddNewTransaction(context),
+        )
+      ],
+    );
+    return Scaffold(
+      backgroundColor: _showDark ? Color(0xff251D3A) : Colors.white,
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Chart(_recentTransactions!),
-            TransactionList(_userTransactions, _deleteTransaction),
+            Container(
+              width: 200,
+              margin: EdgeInsets.only(
+                top: 10,
+                bottom: 10,
+              ),
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: Colors.lightBlueAccent,
+                    width: 7,
+                  ),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _showDark ? 'White Mode' : 'Dark Mode',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: _showDark ? Colors.white : Colors.black,
+                      letterSpacing: 2.0,
+                    ),
+                  ),
+                  Switch(
+                    value: _showDark,
+                    onChanged: (val) {
+                      setState(() {
+                        _showDark = val;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: (MediaQuery.of(context).size.height -
+                      appBar.preferredSize.height -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom) *
+                  0.3,
+              child: Chart(_recentTransactions!),
+            ),
+            Container(
+              height: (MediaQuery.of(context).size.height -
+                      appBar.preferredSize.height -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom) *
+                  0.7,
+              child: TransactionList(
+                _userTransactions,
+                _deleteTransaction,
+              ),
+            ),
             Container(
               padding: EdgeInsets.all(20),
             ),
